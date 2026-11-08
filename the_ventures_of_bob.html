@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#183c2a">
+<title>The Ventures of Bob</title>
+<style>
+:root{color-scheme:dark;--bg:#11291e;--panel:#1b4030;--edge:#52765b;--gold:#ffdc61;--text:#f7f5e9}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#315c42,#10271e 72%);color:var(--text);font:16px/1.45 system-ui,sans-serif}
+.wrap{max-width:1050px;margin:auto;padding:16px}header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.brand{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:950;letter-spacing:-.04em}.brand span{color:var(--gold)}
+button,select{font:inherit;font-weight:750;border:0;border-radius:11px;padding:10px 14px;background:#f5d86a;color:#173321;cursor:pointer}
+button.secondary,select{background:#e8eee5;color:#1b3825}button:disabled{opacity:.45}
+main{background:#0b2119d9;border:1px solid var(--edge);border-radius:20px;padding:clamp(12px,3vw,24px);box-shadow:0 18px 60px #06150d88}
+.screen{display:none}.screen.active{display:block}.panel{background:var(--panel);border:1px solid var(--edge);border-radius:15px;padding:16px}
+.hero{text-align:center;padding:clamp(20px,5vw,48px) 8px}.hero .bob{font-size:6rem}.hero h1{font-size:clamp(2rem,5vw,3rem);margin:0}
+p,.muted{color:#c9d4c8}.actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin:18px 0}
+.hud{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-weight:800;margin-bottom:9px}
+canvas{width:100%;height:auto;display:block;border:3px solid #79532e;border-radius:14px;touch-action:none;background:#9bdcf6}
+.controls{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+.pad{display:grid;grid-template-columns:repeat(3,46px);grid-template-rows:repeat(2,40px);gap:5px}.pad button{padding:3px;font-size:1.2rem}.pad .blank{visibility:hidden}
+.small{font-size:.86rem;color:#c9d4c8}.cards,.shop{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px}
+.card,.item{background:#244a36;border:1px solid #57765e;border-radius:13px;padding:13px}.item button{width:100%;margin-top:8px}
+label{display:block;margin:12px 0 5px;font-weight:750}footer{text-align:center;color:#b6c8b8;font-size:.8rem;padding:14px}
+@media(max-width:560px){.wrap{padding:9px}main{border-radius:14px}.controls{justify-content:center}}
+</style>
+</head>
+<body><div class="wrap">
+<header><div><div class="brand">🌟 Little Bro <span>Adventures</span></div><div class="muted">Jump, explore, and take on the beach boss!</div></div><button id="fullscreen" class="secondary">⛶ Fullscreen (optional)</button></header>
+<main>
+<section id="home" class="screen active"><div class="hero"><div class="bob">🧑🏻‍🦱</div><h1>The Ventures of Bob</h1><p>Three exciting levels, secret coins, and a giant sandy boss!</p><div class="actions"><button id="play">▶ Play</button><button class="secondary" id="settingsBtn">⚙️ Settings</button><button class="secondary" id="questsBtn">🏆 Quests</button><button class="secondary" id="shopBtn">🛍️ Shop</button><button class="secondary" id="lookBtn">🎨 Character</button></div><b id="wallet">🪙 Coins: 0</b></div></section>
+<section id="settings" class="screen panel"><h2>⚙️ Game Settings</h2><label for="mode">Choose your game style</label><select id="mode"><option value="2d">2-D Classic</option><option value="3d">3-D Adventure View</option></select><p class="small">3-D mode uses a perspective-style game view with depth, layered scenery, and raised platforms. 2-D mode uses the classic side view.</p><label for="musicToggle">Background music</label><select id="musicToggle"><option value="on">On</option><option value="off">Off</option></select><div class="actions"><button class="secondary" data-home>Back</button></div></section>
+<section id="quests" class="screen panel"><h2>🏆 Quests</h2><div class="cards"><div class="card">🌿 <b>Level 1 — Green Hills</b><p>Reach the finish flag.</p><span id="q1">Not completed</span></div><div class="card">🕷️ <b>Level 2 — Spider Cave</b><p>Explore the cave and dodge spiders.</p><span id="q2">🔒 Locked</span></div><div class="card">🏖️ <b>Level 3 — Sunny Beach</b><p>Defeat the Sand Monster boss.</p><span id="q3">🔒 Locked</span></div></div><div class="actions"><button class="secondary" data-home>Back</button></div></section>
+<section id="shop" class="screen panel"><h2>🛍️ Character Shop</h2><p>Coins are awarded when you beat a level.</p><div id="shopItems" class="shop"></div><div class="actions"><button class="secondary" data-home>Back</button></div></section>
+<section id="look" class="screen panel"><h2>🎨 Character</h2><div class="actions"><button data-shirt="#277bd1">Blue shirt</button><button data-shirt="#299b54">Green shirt</button><button data-shirt="#db9232">Orange shirt</button><button id="hair">✨ Golden hair</button><button id="hat">🧢 Cap</button><button id="glasses">🤓 Glasses</button></div><div class="actions"><button class="secondary" data-home>Back</button></div></section>
+<section id="game" class="screen"><div class="hud"><span id="levelName">Level 1: Green Hills</span><span id="stats">🪙 0 · ❤️ 3 · ⭐ 0</span></div><div class="hud"><span id="bossLabel"></span><span id="modeLabel">2-D mode</span></div><canvas id="world" width="900" height="430"></canvas><div class="controls"><div class="pad"><span class="blank"></span><button id="up">⬆</button><span class="blank"></span><button id="left">⬅</button><button id="down">⬇</button><button id="right">➡</button></div><div class="actions"><button id="jump">⬆ Jump</button><button id="kick">🦶 Kick</button><button id="blast">⭐ Power</button><button id="pause" class="secondary">Ⅱ Pause</button></div></div><p class="small">Keyboard: ← → move · Space/↑ jump · K kick boss · X use power-up. On the beach, get close and kick the Sand Monster to lower its HP!</p><p id="hint" class="small" aria-live="polite">Collect coins and watch out for hazards.</p></section>
+<section id="result" class="screen panel" style="text-align:center"><div id="resultIcon" style="font-size:4rem">🏆</div><h2 id="resultTitle">Level complete!</h2><p id="resultText"></p><div class="actions"><button id="next">Next Level</button><button id="retry">Try Again</button><button class="secondary" data-home>Home</button></div></section>
+</main><footer>The Ventures of Bob · Browser game · Fullscreen is optional</footer></div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id),cv=$('world'),c=cv.getContext('2d');let screens=['home','settings','quests','shop','look','game','result'];
+let level=1,mode='2d',musicOn=true,audio=null,musicTimer=null,musicStep=0,wallet=0,coins=0,lives=3,power=0,completed=[false,false,false],owned={},shirt='#277bd1',hair=false,hat=false,glasses=false,active=false,paused=false,done=false,cam=0,keys={},touch={};
+let p,platforms=[],planks=[],hazards=[],items=[],spiders=[],boss=null,finishX=1450;
+function show(s){screens.forEach(x=>$(x).classList.toggle('active',x===s))}
+function say(s){$('hint').textContent=s}
+function stats(){$('stats').textContent=`🪙 ${coins} · ❤️ ${lives} · ⭐ ${power}`;$('wallet').textContent=`🪙 Coins: ${wallet}`}
+function questUI(){['q1','q2','q3'].forEach((id,i)=>$(id).textContent=completed[i]?'✅ Completed':i===0?'Not completed':completed[i-1]?'🔓 Unlocked':'🔒 Locked')}
+function startMusic(){
+ if(!musicOn||audio)return;
+ try{audio=new (window.AudioContext||window.webkitAudioContext)();let notes=[261.63,329.63,392,329.63,293.66,349.23,440,349.23];
+ const play=()=>{if(!audio||!musicOn)return;let t=audio.currentTime;let osc=audio.createOscillator(),gain=audio.createGain();osc.type='triangle';osc.frequency.value=notes[musicStep++%notes.length];gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(.045,t+.04);gain.gain.exponentialRampToValueAtTime(.0001,t+.28);osc.connect(gain);gain.connect(audio.destination);osc.start(t);osc.stop(t+.3)};
+ play();musicTimer=setInterval(play,340);
+ }catch(e){/* Audio may be unavailable; gameplay remains unaffected. */}
+}
+function stopMusic(){if(musicTimer)clearInterval(musicTimer);musicTimer=null;if(audio){audio.close().catch(()=>{});audio=null}}
+function setMusic(on){musicOn=on;if(on)startMusic();else stopMusic()}
+function setup(n){
+ level=n;coins=0;lives=3;power=0;cam=0;done=false;paused=false;
+ p={x:65,y:320,vx:0,vy:0,w:30,h:48,ground:false,face:1};
+ hazards=[];items=[];spiders=[];boss=null;
+ if(level===1){$('levelName').textContent='Level 1: Green Hills';finishX=1450;platforms=[{x:0,y:380,w:1580,h:60},{x:210,y:315,w:125,h:15},{x:430,y:280,w:135,h:15},{x:700,y:320,w:150,h:15},{x:970,y:275,w:145,h:15},{x:1200,y:325,w:130,h:15}];planks=[{x:345,y:340,w:125},{x:590,y:300,w:125},{x:865,y:340,w:140},{x:1135,y:300,w:135}];hazards=[290,520,780,1040,1350].map(x=>({x,y:351}));items=[180,260,470,630,740,1000,1160,1260].map((x,i)=>({x,y:[340,275,240,265,280,235,265,285][i],type:'coin'}));items.push({x:620,y:250,type:'star'});spiders=[]}
+ if(level===2){$('levelName').textContent='Level 2: Spider Cave';finishX=1450;platforms=[{x:0,y:380,w:1580,h:60},{x:200,y:315,w:140,h:15},{x:430,y:280,w:145,h:15},{x:690,y:320,w:150,h:15},{x:950,y:275,w:150,h:15},{x:1210,y:320,w:145,h:15}];planks=[{x:345,y:340,w:120},{x:580,y:305,w:120},{x:840,y:340,w:120},{x:1100,y:300,w:120}];hazards=[370,810,1170].map(x=>({x,y:351}));items=[160,475,720,980,1280].map((x,i)=>({x,y:[340,245,280,235,280][i],type:'coin'}));[280,770,1200].forEach(x=>items.push({x,y:270,type:'star'}));spiders=[510,780,1040,1320].map(x=>({x,alive:true}))}
+ if(level===3){$('levelName').textContent='Level 3: Sunny Beach — Boss Battle';finishX=1900;platforms=[{x:0,y:380,w:2050,h:60},{x:260,y:320,w:150,h:15},{x:600,y:290,w:160,h:15},{x:980,y:320,w:160,h:15},{x:1360,y:285,w:160,h:15}];planks=[];hazards=[];items=[180,360,650,850,1100,1450].map((x,i)=>({x,y:[340,280,250,280,275,245][i],type:'coin'}));items.push({x:800,y:260,type:'star'});boss={x:1470,y:285,hp:8,max:8,hitFlash:0,alive:true}}
+ $('modeLabel').textContent=mode==='3d'?'3-D perspective view':'2-D classic view';$('bossLabel').textContent=level===3?'👹 Sand Monster HP: 8 / 8':'';active=true;show('game');say(level===3?'Boss battle! Get close to the Sand Monster and kick it!':'Collect coins, jump across platforms, and avoid hazards.');stats();draw();
+}
+function R(x,y,w,h,color){c.fillStyle=color;c.fillRect(x-cam,y,w,h)}
+function bob(){
+ let x=p.x-cam,y=p.y;c.save();if(p.face<0){c.translate(x+p.w,y);c.scale(-1,1);x=0;y=0}
+ c.fillStyle='#263449';c.fillRect(x+5,y+34,8,14);c.fillRect(x+18,y+34,8,14);c.fillStyle=shirt;c.fillRect(x+3,y+18,25,20);c.fillStyle='#f2c49a';c.beginPath();c.arc(x+15,y+10,11,0,7);c.fill();c.fillStyle=hair||owned['Golden hair']?'#f4c542':'#50321f';c.beginPath();c.arc(x+14,y+4,10,Math.PI,Math.PI*2);c.fill();c.fillStyle='#29221e';c.fillRect(x+19,y+8,2,3);c.strokeStyle='#743d35';c.beginPath();c.arc(x+17,y+13,4,.15,2.6);c.stroke();if(hat||owned.Cap){c.fillStyle='#e34c3c';c.fillRect(x+3,y-1,24,5);c.fillRect(x+8,y-7,14,8)}if(glasses||owned.Glasses){c.strokeStyle='#222';c.strokeRect(x+5,y+6,8,6);c.strokeRect(x+17,y+6,8,6)}c.restore();
+}
+function draw(){
+ c.clearRect(0,0,900,430);
+ if(level===1){let g=c.createLinearGradient(0,0,0,430);g.addColorStop(0,'#8ed7fa');g.addColorStop(1,'#e2f8ff');c.fillStyle=g;c.fillRect(0,0,900,430);c.fillStyle='#fff';for(let i=0;i<5;i++){let x=((i*240-cam*.18)%1100+1100)%1100;c.beginPath();c.arc(x,80+i%2*25,24,0,7);c.arc(x+24,80+i%2*25,28,0,7);c.fill()}c.fillStyle='#72bb64';c.fillRect(0,370,900,60)}
+ if(level===2){c.fillStyle='#25233b';c.fillRect(0,0,900,430);c.fillStyle='#51456b';for(let i=0;i<12;i++){let x=((i*110-cam*.3)%1000+1000)%1000;c.beginPath();c.moveTo(x,0);c.lineTo(x+35,70);c.lineTo(x+70,0);c.fill()}}
+ if(level===3){let g=c.createLinearGradient(0,0,0,430);g.addColorStop(0,'#54c9f1');g.addColorStop(.7,'#b5edff');g.addColorStop(.701,'#f5d46e');g.addColorStop(1,'#dca64c');c.fillStyle=g;c.fillRect(0,0,900,430);c.fillStyle='#fff5bf';c.beginPath();c.arc(760,85,42,0,7);c.fill();c.fillStyle='#218fba';c.fillRect(0,285,900,55);c.fillStyle='#f3ce71';c.fillRect(0,340,900,90);c.fillStyle='#d6a44e';for(let i=0;i<22;i++){let x=(i*67-cam*.5)%930;c.beginPath();c.arc((x+930)%930,365+(i%4)*13,2,0,7);c.fill()}c.fillStyle='#278b4d';for(let i=0;i<4;i++){let x=80+i*240-cam*.12;c.fillRect(x,190,8,125);c.beginPath();c.arc(x+5,180,45,Math.PI,Math.PI*2);c.fill()}}
+ let floor=level===3?'#e8bc60':level===2?'#6b6478':'#55a94e';
+ platforms.forEach(a=>{R(a.x,a.y,a.w,a.h,floor);R(a.x,a.y,a.w,5,level===3?'#ffe08b':level===2?'#a59ab7':'#a1df70')});
+ planks.forEach(a=>{R(a.x,a.y,a.w,13,'#8b5428');R(a.x,a.y,a.w,4,'#d29a55');for(let x=a.x+12;x<a.x+a.w;x+=34)R(x,a.y+2,3,9,'#603817')});
+ hazards.forEach(h=>{let x=h.x-cam;if(x<-45||x>945)return;c.fillStyle='#e8e1d0';c.fillRect(x+11,h.y+18,13,17);c.fillStyle='#a51f45';c.beginPath();c.moveTo(x,h.y+20);c.quadraticCurveTo(x+4,h.y-3,x+18,h.y);c.quadraticCurveTo(x+37,h.y-3,x+38,h.y+20);c.fill();c.fillStyle='#f7d8e3';for(let i=0;i<5;i++){let sx=x+4+i*7;c.beginPath();c.moveTo(sx,h.y+7);c.lineTo(sx+3,h.y-3);c.lineTo(sx+7,h.y+9);c.fill()}});
+ items.forEach(it=>{if(it.got)return;let x=it.x-cam;if(it.type==='coin'){c.fillStyle='#bd8100';c.beginPath();c.arc(x,it.y,10,0,7);c.fill();c.fillStyle='#ffe66d';c.beginPath();c.arc(x,it.y,7,0,7);c.fill()}else{c.font='25px sans-serif';c.fillText('⭐',x-12,it.y+9)}});
+ spiders.forEach(s=>{if(s.alive){c.font='29px sans-serif';c.fillText('🕷️',s.x-cam-14,360)}});
+ if(boss&&boss.alive){let x=boss.x-cam,y=boss.y;c.save();if(boss.hitFlash>0){c.globalAlpha=.55;boss.hitFlash--}c.fillStyle='#bd853c';c.beginPath();c.ellipse(x,y+38,58,54,0,0,7);c.fill();c.fillStyle='#e5b45c';c.beginPath();c.arc(x,y,48,0,7);c.fill();c.fillStyle='#603e25';c.beginPath();c.arc(x-17,y-5,6,0,7);c.arc(x+17,y-5,6,0,7);c.fill();c.strokeStyle='#603e25';c.lineWidth=4;c.beginPath();c.arc(x,y+12,16,.2,Math.PI-.2);c.stroke();c.fillStyle='#a66c30';for(let i=0;i<5;i++){c.beginPath();c.moveTo(x-35+i*17,y-35);c.lineTo(x-27+i*17,y-55);c.lineTo(x-18+i*17,y-34);c.fill()}c.restore();c.fillStyle='#351d17';c.fillRect(x-48,y-69,96,10);c.fillStyle='#ef4c45';c.fillRect(x-47,y-68,94*(boss.hp/boss.max),8);c.fillStyle='#fff';c.font='bold 14px system-ui';c.textAlign='center';c.fillText('SAND MONSTER',x,y-78);c.textAlign='left'}
+ if(level!==3){R(finishX,285,8,95,'#68452c');c.fillStyle='#e94343';c.beginPath();c.moveTo(finishX+8-cam,285);c.lineTo(finishX+65-cam,300);c.lineTo(finishX+8-cam,315);c.fill()}
+ if(mode==='3d'){c.fillStyle='#fff';c.font='bold 12px system-ui';c.fillText('DEPTH VIEW',14,22)}
+ bob();
+}
+function overlap(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
+function result(win){if(done)return;done=true;active=false;show('result');$('resultIcon').textContent=win?'🏆':'💥';$('resultTitle').textContent=win?'Level complete!':'Oh no! Try again!';if(win){wallet+=coins;completed[level-1]=true;$('resultText').textContent=`You beat the level and earned ${coins} coins!`;$('next').style.display=level<3?'inline-block':'none'}else{$('resultText').textContent='Bob ran out of hearts. Try again and watch your jumps!';$('next').style.display='none'}questUI();stats()}
+function winDance(){if(done)return;active=false;let start=performance.now();function dance(t){draw();let e=t-start;c.save();c.translate(p.x-cam+15,p.y+20);c.rotate(Math.sin(e/65)*.25);c.font='27px sans-serif';c.fillText('🎉',-12,-18);c.restore();if(e<1300)requestAnimationFrame(dance);else result(true)}requestAnimationFrame(dance)}
+function hurt(){lives--;p.x=Math.max(35,p.x-130);p.y=290;p.vy=0;if(lives<=0)result(false);stats()}
+function update(){
+ if(!active||paused)return;
+ let l=keys.ArrowLeft||keys.a||touch.left,r=keys.ArrowRight||keys.d||touch.right,j=keys[' ']||keys.ArrowUp||touch.jump;
+ p.vx=l?-3.4:r?3.4:0;if(p.vx)p.face=p.vx>0?1:-1;if(j&&p.ground){p.vy=-10.8;p.ground=false}
+ p.vy+=.48;p.x+=p.vx;p.x=Math.max(0,Math.min(finishX+120,p.x));let old=p.y;p.y+=p.vy;p.ground=false;
+ [...platforms,...planks.map(a=>({...a,h:13}))].forEach(a=>{if(p.x+p.w>a.x&&p.x<a.x+a.w&&old+p.h<=a.y+5&&p.y+p.h>=a.y&&p.vy>=0){p.y=a.y-p.h;p.vy=0;p.ground=true}});
+ if(p.y>440){hurt();if(done)return}
+ hazards.forEach(h=>{if(overlap({x:p.x+5,y:p.y+7,w:20,h:40},{x:h.x+2,y:h.y+2,w:34,h:34}))hurt()});
+ spiders.forEach(s=>{if(s.alive&&overlap({x:p.x+4,y:p.y+7,w:22,h:38},{x:s.x-13,y:330,w:28,h:30}))hurt()});
+ items.forEach(it=>{if(!it.got&&Math.abs(p.x+15-it.x)<24&&Math.abs(p.y+20-it.y)<35){it.got=true;if(it.type==='coin')coins++;else power++;stats()}});
+ cam=Math.max(0,Math.min(finishX-700,p.x-300));
+ if(level===3&&boss&&boss.alive&&boss.hp<=0){boss.alive=false;say('The Sand Monster is defeated! You won the beach boss battle!');winDance();return}
+ if(level===3&&boss&&boss.alive&&p.x>finishX-100){p.x=finishX-110;say('Defeat the Sand Monster first! Kick it to lower its HP.')}
+ if(level!==3&&p.x>=finishX)winDance();
+ draw();stats();if(level===3&&boss&&boss.alive)$('bossLabel').textContent=`👹 Sand Monster HP: ${boss.hp} / ${boss.max}`;
+}
+function kick(){if(!active||level!==3||!boss||!boss.alive)return;if(Math.abs((p.x+15)-boss.x)<105&&Math.abs(p.y-boss.y)<100){boss.hp--;boss.hitFlash=8;say('POW! You kicked the Sand Monster!');if(boss.hp<=0){boss.alive=false;winDance()}draw()}else say('Get closer to the Sand Monster to kick it!')}
+function blast(){if(!active||power<1)return;let s=spiders.filter(x=>x.alive).sort((a,b)=>Math.abs(a.x-p.x)-Math.abs(b.x-p.x))[0];if(s&&Math.abs(s.x-p.x)<300){s.alive=false;power--;say('Web blast! Spider defeated!')}else say('No spider close enough!');stats();draw()}
+$('play').onclick=()=>{startMusic();setup(1)};$('questStart').onclick=()=>{startMusic();setup(1)};$('settingsBtn').onclick=()=>show('settings');$('questsBtn').onclick=()=>{questUI();show('quests')};$('shopBtn').onclick=()=>{renderShop();show('shop')};$('lookBtn').onclick=()=>show('look');
+$('mode').onchange=e=>{mode=e.target.value;$('modeLabel').textContent=mode==='3d'?'3-D perspective view':'2-D classic view';if(active)draw()};
+$('musicToggle').onchange=e=>setMusic(e.target.value==='on');
+$('fullscreen').onclick=async()=>{try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()}catch(e){say('Fullscreen is not available here. You can still play normally.')}};
+document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>show('home'));
+$('next').onclick=()=>setup(level+1);$('retry').onclick=()=>setup(level);
+$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'▶ Resume':'Ⅱ Pause';say(paused?'Game paused':'Back in action!')};
+$('kick').onclick=kick;$('blast').onclick=blast;
+document.querySelectorAll('[data-shirt]').forEach(b=>b.onclick=()=>shirt=b.dataset.shirt);$('hair').onclick=()=>hair=!hair;$('hat').onclick=()=>hat=!hat;$('glasses').onclick=()=>glasses=!glasses;
+function renderShop(){let list=[['Cap','🧢',5],['Glasses','🤓',5],['Golden hair','✨',8],['Blue shirt','👕',4],['Green shirt','👕',4]];$('shopItems').innerHTML=list.map(([n,e,cost])=>`<div class="item"><div style="font-size:1.8rem">${e}</div><b>${n}</b><div>🪙 ${cost}</div><button data-buy="${n}">${owned[n]?'Owned':'Buy'}</button></div>`).join('');$('shopItems').querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{let n=b.dataset.buy,cost=list.find(x=>x[0]===n)[2];if(!owned[n]&&wallet>=cost){wallet-=cost;owned[n]=true;stats();renderShop()}else if(!owned[n])alert('You need more coins!')})}
+function bind(id,d){let b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();touch[d]=true});['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>touch[d]=false))}
+bind('left','left');bind('right','right');bind('jump','jump');bind('up','jump');
+window.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp',' '].includes(e.key))e.preventDefault();keys[e.key]=true;if(e.key.toLowerCase()==='k')kick();if(e.key.toLowerCase()==='x')blast()});window.addEventListener('keyup',e=>keys[e.key]=false);
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&active){paused=true;$('pause').textContent='▶ Resume'}});
+document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>show('home'));questUI();stats();
+function loop(){update();requestAnimationFrame(loop)}requestAnimationFrame(loop);
+})();
+</script></body></html>
